@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function App() {
   const [formData, setFormData] = useState({
@@ -8,6 +8,17 @@ function App() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
+  useEffect(() => {
+    if (!toastMessage) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => setToastMessage(''), 5000);
+    return () => window.clearTimeout(timeoutId);
+  }, [toastMessage]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,15 +31,13 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Form Submitted:', formData);
-    alert('Signup Successful!');
-  };
-
-  const handleClear = () => {
     setFormData({
       username: '',
       email: '',
       password: ''
     });
+    setTermsAccepted(false);
+    setToastMessage('Signup submitted successfully!');
   };
 
   const togglePasswordVisibility = () => {
@@ -136,16 +145,11 @@ function App() {
     },
     buttonGroup: {
       display: 'flex',
-      flexDirection: 'column', // Stack buttons on mobile
-      gap: '15px',
+      flexDirection: 'column',
       marginTop: '30px'
     },
-    buttonRow: {
-      display: 'flex',
-      gap: '15px'
-    },
     submitBtn: {
-      flex: 1,
+      width: '100%',
       padding: '15px',
       backgroundColor: '#156d81', // Matching theme
       color: 'white',
@@ -154,41 +158,16 @@ function App() {
       fontSize: '16px',
       fontWeight: '600',
       cursor: 'pointer',
+      boxSizing: 'border-box',
       transition: 'background-color 0.2s, transform 0.1s',
       boxShadow: '0 4px 10px rgba(21, 109, 129, 0.3)'
     },
     submitBtnHover: {
       backgroundColor: '#0d5a6c'
     },
-    clearBtn: {
-      flex: 1,
-      padding: '15px',
-      backgroundColor: '#f1f1f1',
-      color: '#555',
-      border: 'none',
-      borderRadius: '10px',
-      fontSize: '16px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'background-color 0.2s, transform 0.1s'
-    },
-    clearBtnHover: {
-      backgroundColor: '#e5e5e5'
-    },
-    resetBtn: {
-      padding: '15px',
-      backgroundColor: '#e74c3c', // Modern red
-      color: 'white',
-      border: 'none',
-      borderRadius: '10px',
-      fontSize: '16px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'background-color 0.2s, transform 0.1s',
-      boxShadow: '0 4px 10px rgba(231, 76, 60, 0.3)'
-    },
-    newsletterGroup: {
-      marginTop: '15px',
+    termsGroup: {
+      marginTop: '5px',
+      marginBottom: '15px',
       display: 'flex',
       alignItems: 'center',
       color: '#666',
@@ -198,6 +177,18 @@ function App() {
       marginRight: '10px',
       cursor: 'pointer',
       accentColor: '#156d81' // modern checkbox color
+    },
+    toast: {
+      position: 'fixed',
+      bottom: '20px',
+      right: '20px',
+      zIndex: 1,
+      padding: '14px 20px',
+      borderRadius: '8px',
+      backgroundColor: '#1f7a4d',
+      color: 'white',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+      fontSize: '14px'
     },
     warningText: {
       marginTop: '30px',
@@ -239,6 +230,11 @@ function App() {
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
 
       <div style={styles.formContainer}>
+        {toastMessage && (
+          <div role="status" aria-live="polite" style={styles.toast}>
+            {toastMessage}
+          </div>
+        )}
         <div style={styles.logoContainer}>
           <div style={styles.logo}>∆</div> {/* Placeholder Logo Icon */}
         </div>
@@ -299,22 +295,22 @@ function App() {
             </div>
           </div>
 
-          <div style={styles.buttonGroup}>
-            <div style={styles.buttonRow}>
-              <button type="submit" style={styles.submitBtn}>
-                Submit
-              </button>
-              <button type="button" onClick={handleClear} style={styles.clearBtn}>
-                Clear
-              </button>
-            </div>
-            <button type="button" style={styles.resetBtn}>
-              Reset Form
-            </button>
+          <div style={styles.termsGroup}>
+            <input
+              type="checkbox"
+              id="terms"
+              name="terms"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              style={styles.checkbox}
+              required
+            />
+            <label htmlFor="terms">Accept our Terms and Conditions</label>
           </div>
-          <div style={styles.newsletterGroup}>
-            <input type="checkbox" id="subscribe" name="subscribe" style={styles.checkbox} />
-            <label htmlFor="subscribe">Subscribe to our newsletter</label>
+          <div style={styles.buttonGroup}>
+            <button type="submit" style={styles.submitBtn}>
+              Submit
+            </button>
           </div>
 
         </form>
