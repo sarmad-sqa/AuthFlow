@@ -2,7 +2,7 @@
   "name": "signup-form",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://sarmad-sqa.github.io/my-first-react-cicd/",
+  "homepage": "https://sarmad-sqa.github.io/authflow/",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
