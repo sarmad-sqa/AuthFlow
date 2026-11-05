@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Login from './Login';
 
 function App() {
+  const [showLogin, setShowLogin] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -8,6 +10,19 @@ function App() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!toastMessage) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => setToastMessage(''), 3000);
+    return () => window.clearTimeout(timeoutId);
+  }, [toastMessage]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,18 +32,52 @@ function App() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form Submitted:', formData);
-    alert('Signup Successful!');
-  };
+    setIsSubmitting(true);
 
-  const handleClear = () => {
-    setFormData({
-      username: '',
-      email: '',
-      password: ''
-    });
+    try {
+      const response = await fetch('http://localhost:3000/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      let responseData = {};
+      try {
+        responseData = await response.json();
+      } catch {
+        // Use the HTTP status when the server does not return JSON.
+      }
+
+      if (response.status !== 201) {
+        setToastType('error');
+        setToastMessage(
+          responseData.message || `Signup failed (HTTP ${response.status}).`
+        );
+        return;
+      }
+
+      setFormData({
+        username: '',
+        email: '',
+        password: ''
+      });
+      setTermsAccepted(false);
+      setToastType('success');
+      setToastMessage('Signup submitted successfully!');
+    } catch {
+      setToastType('error');
+      setToastMessage('Unable to connect to the signup server. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -136,16 +185,11 @@ function App() {
     },
     buttonGroup: {
       display: 'flex',
-      flexDirection: 'column', // Stack buttons on mobile
-      gap: '15px',
+      flexDirection: 'column',
       marginTop: '30px'
     },
-    buttonRow: {
-      display: 'flex',
-      gap: '15px'
-    },
     submitBtn: {
-      flex: 1,
+      width: '100%',
       padding: '15px',
       backgroundColor: '#156d81', // Matching theme
       color: 'white',
@@ -154,41 +198,16 @@ function App() {
       fontSize: '16px',
       fontWeight: '600',
       cursor: 'pointer',
+      boxSizing: 'border-box',
       transition: 'background-color 0.2s, transform 0.1s',
       boxShadow: '0 4px 10px rgba(21, 109, 129, 0.3)'
     },
     submitBtnHover: {
       backgroundColor: '#0d5a6c'
     },
-    clearBtn: {
-      flex: 1,
-      padding: '15px',
-      backgroundColor: '#f1f1f1',
-      color: '#555',
-      border: 'none',
-      borderRadius: '10px',
-      fontSize: '16px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'background-color 0.2s, transform 0.1s'
-    },
-    clearBtnHover: {
-      backgroundColor: '#e5e5e5'
-    },
-    resetBtn: {
-      padding: '15px',
-      backgroundColor: '#e74c3c', // Modern red
-      color: 'white',
-      border: 'none',
-      borderRadius: '10px',
-      fontSize: '16px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'background-color 0.2s, transform 0.1s',
-      boxShadow: '0 4px 10px rgba(231, 76, 60, 0.3)'
-    },
-    newsletterGroup: {
-      marginTop: '15px',
+    termsGroup: {
+      marginTop: '5px',
+      marginBottom: '15px',
       display: 'flex',
       alignItems: 'center',
       color: '#666',
@@ -198,6 +217,21 @@ function App() {
       marginRight: '10px',
       cursor: 'pointer',
       accentColor: '#156d81' // modern checkbox color
+    },
+    toast: {
+      position: 'fixed',
+      bottom: '20px',
+      right: '20px',
+      zIndex: 1,
+      padding: '14px 20px',
+      borderRadius: '8px',
+      backgroundColor: '#1f7a4d',
+      color: 'white',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+      fontSize: '14px'
+    },
+    errorToast: {
+      backgroundColor: '#c0392b'
     },
     warningText: {
       marginTop: '30px',
@@ -231,7 +265,9 @@ function App() {
       : styles.passwordInput;
   };
 
-  return (
+  return showLogin ? (
+    <Login onShowSignup={() => setShowLogin(false)} />
+  ) : (
     <div style={styles.pageBackground}>
       {/* Add Poppins font link to head */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -239,6 +275,17 @@ function App() {
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
 
       <div style={styles.formContainer}>
+        {toastMessage && (
+          <div
+            role={toastType === 'error' ? 'alert' : 'status'}
+            aria-live={toastType === 'error' ? 'assertive' : 'polite'}
+            style={toastType === 'error'
+              ? { ...styles.toast, ...styles.errorToast }
+              : styles.toast}
+          >
+            {toastMessage}
+          </div>
+        )}
         <div style={styles.logoContainer}>
           <div style={styles.logo}>∆</div> {/* Placeholder Logo Icon */}
         </div>
@@ -299,25 +346,39 @@ function App() {
             </div>
           </div>
 
-          <div style={styles.buttonGroup}>
-            <div style={styles.buttonRow}>
-              <button type="submit" style={styles.submitBtn}>
-                Submit
-              </button>
-              <button type="button" onClick={handleClear} style={styles.clearBtn}>
-                Clear
-              </button>
-            </div>
-            <button type="button" style={styles.resetBtn}>
-              Reset Form
-            </button>
+          <div style={styles.termsGroup}>
+            <input
+              type="checkbox"
+              id="terms"
+              name="terms"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              style={styles.checkbox}
+              required
+            />
+            <label htmlFor="terms">Accept our Terms and Conditions</label>
           </div>
-          <div style={styles.newsletterGroup}>
-            <input type="checkbox" id="subscribe" name="subscribe" style={styles.checkbox} />
-            <label htmlFor="subscribe">Subscribe to our newsletter</label>
+          <div style={styles.buttonGroup}>
+            <button type="submit" style={styles.submitBtn} disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit'}
+            </button>
           </div>
 
         </form>
+
+        <p style={styles.dev1SupportText}>
+          Already have an account?{' '}
+          <a
+            href="#login"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowLogin(true);
+            }}
+            style={{ color: '#156d81', fontWeight: '600' }}
+          >
+            Log In
+          </a>
+        </p>
 
         <p style={styles.warningText}>
           Warning: Do not share your OTP with anyone!
