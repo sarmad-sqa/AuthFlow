@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import Login from './Login';
 
 function App() {
+  const [showLogin, setShowLogin] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -10,6 +12,8 @@ function App() {
   const [showPassword, setShowPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!toastMessage) {
@@ -28,16 +32,52 @@ function App() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form Submitted:', formData);
-    setFormData({
-      username: '',
-      email: '',
-      password: ''
-    });
-    setTermsAccepted(false);
-    setToastMessage('Signup submitted successfully!');
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('http://localhost:3000/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      let responseData = {};
+      try {
+        responseData = await response.json();
+      } catch {
+        // Use the HTTP status when the server does not return JSON.
+      }
+
+      if (response.status !== 201) {
+        setToastType('error');
+        setToastMessage(
+          responseData.message || `Signup failed (HTTP ${response.status}).`
+        );
+        return;
+      }
+
+      setFormData({
+        username: '',
+        email: '',
+        password: ''
+      });
+      setTermsAccepted(false);
+      setToastType('success');
+      setToastMessage('Signup submitted successfully!');
+    } catch {
+      setToastType('error');
+      setToastMessage('Unable to connect to the signup server. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -190,6 +230,9 @@ function App() {
       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
       fontSize: '14px'
     },
+    errorToast: {
+      backgroundColor: '#c0392b'
+    },
     warningText: {
       marginTop: '30px',
       textAlign: 'center',
@@ -222,7 +265,9 @@ function App() {
       : styles.passwordInput;
   };
 
-  return (
+  return showLogin ? (
+    <Login onShowSignup={() => setShowLogin(false)} />
+  ) : (
     <div style={styles.pageBackground}>
       {/* Add Poppins font link to head */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -231,7 +276,13 @@ function App() {
 
       <div style={styles.formContainer}>
         {toastMessage && (
-          <div role="status" aria-live="polite" style={styles.toast}>
+          <div
+            role={toastType === 'error' ? 'alert' : 'status'}
+            aria-live={toastType === 'error' ? 'assertive' : 'polite'}
+            style={toastType === 'error'
+              ? { ...styles.toast, ...styles.errorToast }
+              : styles.toast}
+          >
             {toastMessage}
           </div>
         )}
@@ -308,12 +359,26 @@ function App() {
             <label htmlFor="terms">Accept our Terms and Conditions</label>
           </div>
           <div style={styles.buttonGroup}>
-            <button type="submit" style={styles.submitBtn}>
-              Submit
+            <button type="submit" style={styles.submitBtn} disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>
           </div>
 
         </form>
+
+        <p style={styles.dev1SupportText}>
+          Already have an account?{' '}
+          <a
+            href="#login"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowLogin(true);
+            }}
+            style={{ color: '#156d81', fontWeight: '600' }}
+          >
+            Log In
+          </a>
+        </p>
 
         <p style={styles.warningText}>
           Warning: Do not share your OTP with anyone!

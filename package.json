@@ -17,23 +17,28 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start:e2e": "node scripts/start-e2e.js",
+    "test:e2e": "playwright test"
   },
-"eslintConfig": {
-  "extends": [
-    "react-app",
-    "react-app/jest"
-  ],
-  "overrides": [
-    {
-      "files": ["tests/*.js", "tests/**/*.js"],
-      "rules": {
-        "testing-library/prefer-screen-queries": "off"
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "^26.6.6"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "overrides": [
+      {
+        "files": ["tests/*.js", "tests/**/*.js"],
+        "rules": {
+          "testing-library/prefer-screen-queries": "off"
+        }
       }
-    }
-  ]
-},
-
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -45,9 +50,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.64.1",
-    "@types/node": "^26.6.6"
   }
 }
