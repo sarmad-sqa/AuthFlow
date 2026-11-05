@@ -20,7 +20,7 @@ function App() {
       return undefined;
     }
 
-    const timeoutId = window.setTimeout(() => setToastMessage(''), 3000);
+    const timeoutId = window.setTimeout(() => setToastMessage(''), 5000);
     return () => window.clearTimeout(timeoutId);
   }, [toastMessage]);
 
