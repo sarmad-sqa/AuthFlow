@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/my-first-react-cicd/static/css/main.e6c13ad2.css",
-    "main.js": "/my-first-react-cicd/static/js/main.179d2f1d.js",
-    "static/js/453.5892e372.chunk.js": "/my-first-react-cicd/static/js/453.5892e372.chunk.js",
-    "index.html": "/my-first-react-cicd/index.html",
-    "main.e6c13ad2.css.map": "/my-first-react-cicd/static/css/main.e6c13ad2.css.map",
-    "main.179d2f1d.js.map": "/my-first-react-cicd/static/js/main.179d2f1d.js.map",
-    "453.5892e372.chunk.js.map": "/my-first-react-cicd/static/js/453.5892e372.chunk.js.map"
+    "main.css": "/authflow/static/css/main.e6c13ad2.css",
+    "main.js": "/authflow/static/js/main.38a67dee.js",
+    "static/js/453.5892e372.chunk.js": "/authflow/static/js/453.5892e372.chunk.js",
+    "index.html": "/authflow/index.html",
+    "main.e6c13ad2.css.map": "/authflow/static/css/main.e6c13ad2.css.map",
+    "main.38a67dee.js.map": "/authflow/static/js/main.38a67dee.js.map",
+    "453.5892e372.chunk.js.map": "/authflow/static/js/453.5892e372.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.179d2f1d.js"
+    "static/js/main.38a67dee.js"
   ]
 }
