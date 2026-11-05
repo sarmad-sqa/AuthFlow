@@ -1,70 +1,184 @@
-# Getting Started with Create React App
+# AuthFlow
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Full-Stack Signup Application with Login UI**
 
-## Available Scripts
+AuthFlow is a web application built using React, Node.js, Express.js, and Turso Database. The project currently implements a complete Signup flow with backend and database integration, along with a Login frontend UI.
 
-In the project directory, you can run:
+## 🚀 Features
 
-### `npm start`
+### Signup
+- User registration using React.
+- Express.js Signup API integration.
+- Turso database connectivity using LibSQL.
+- Password hashing using bcrypt.
+- Required field validation.
+- Terms & Conditions validation.
+- Duplicate email handling.
+- Success and error notifications.
+- Form reset after successful registration.
+- Backend error handling.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Login
+- Login page UI built with React.
+- Signup and Login page navigation.
+- Password visibility toggle.
+- Login backend API integration: **Pending**.
+- Login authentication and credential verification: **Pending**.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🛠️ Tech Stack
 
-### `npm test`
+| Technology | Purpose |
+|---|---|
+| React.js | Frontend development |
+| Node.js | Backend runtime |
+| Express.js | REST API |
+| Turso | Database |
+| LibSQL | Database connectivity |
+| bcrypt | Password hashing |
+| Playwright | End-to-end testing |
+| React Testing Library | Component testing |
+| GitHub Actions | CI/CD automation |
+| Git & GitHub | Version control |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 📁 Project Structure
 
-### `npm run build`
+```text
+authflow/
+├── .github/
+│   └── workflows/
+│       ├── main.yml
+│       └── playwright.yml
+├── public/
+├── scripts/
+│   └── start-e2e.js
+├── server/
+│   ├── db.js
+│   ├── index.js
+│   ├── package.json
+│   └── package-lock.json
+├── src/
+│   ├── App.js
+│   ├── App.test.js
+│   └── Login.js
+├── tests/
+│   ├── SignUp.spec.js
+│   └── example.spec.js
+├── .gitignore
+├── package.json
+├── package-lock.json
+└── playwright.config.js
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## ⚙️ Installation & Setup
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 1. Clone the Repository
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+git clone https://github.com/sarmad-sqa/authflow.git
+cd authflow
+```
 
-### `npm run eject`
+### 2. Install Frontend Dependencies
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+npm ci
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 3. Install Backend Dependencies
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+npm ci --prefix server
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 4. Configure Environment Variables
 
-## Learn More
+Create a `.env` file inside the `server` directory.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```env
+TURSO_DATABASE_URL=your_turso_database_url
+TURSO_AUTH_TOKEN=your_turso_auth_token
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Never commit environment files or expose database credentials publicly.
 
-### Code Splitting
+## ▶️ Run Locally
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Start Backend
 
-### Analyzing the Bundle Size
+```bash
+cd server
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Backend: `http://localhost:3000`
 
-### Making a Progressive Web App
+### Start Frontend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Open another terminal in the project root:
 
-### Advanced Configuration
+```powershell
+$env:PORT=3001
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Frontend: `http://localhost:3001`
 
-### Deployment
+## 🧪 Testing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### React Tests
 
-### `npm run build` fails to minify
+```bash
+npm test -- --watchAll=false
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Playwright E2E Tests
+
+```bash
+npm run test:e2e
+```
+
+Configured browsers:
+- Chromium
+- Firefox
+- WebKit
+
+### Production Build
+
+```bash
+npm run build
+```
+
+## 🔄 CI/CD Pipeline
+
+GitHub Actions automates the project's testing and build processes.
+
+### React CI Pipeline
+- Installs dependencies.
+- Runs React component tests.
+- Generates an optimized production build.
+- Deploys the frontend to GitHub Pages.
+
+### Playwright Tests
+- Installs frontend and backend dependencies.
+- Installs Playwright browsers.
+- Uses GitHub Secrets for Turso credentials.
+- Executes automated cross-browser tests.
+- Uploads HTML test reports as workflow artifacts.
+
+## 🌐 Live Demo
+
+[View AuthFlow](https://sarmad-sqa.github.io/authflow/)
+
+**Note:** The live GitHub Pages deployment hosts the frontend. Signup API functionality requires the Express backend to be running or deployed separately. Login currently provides the frontend UI only.
+
+## 👨‍💻 Author
+
+**Sarmad Sarwar**
+
+Executive SQA Engineer | Software Quality Assurance | Test Automation
+
+- GitHub: [@sarmad-sqa](https://github.com/sarmad-sqa)
+
+---
+
+⭐ Feel free to explore the project and its implementation.
