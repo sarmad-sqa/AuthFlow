@@ -6,8 +6,12 @@ const app = express();
 app.use((req, res, next) => {
     const origin = req.get('Origin');
     const isLocalFrontend = origin && /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+     const isVercelFrontend = origin && (
+        origin === 'https://auth-flow-flame.vercel.app' ||
+        /^https:\/\/auth-flow-flame-[\w-]+\.vercel\.app$/.test(origin)
+    );
 
-    if (isLocalFrontend) {
+    if (isLocalFrontend || isVercelFrontend) {
         res.setHeader('Access-Control-Allow-Origin', origin);
         res.setHeader('Vary', 'Origin');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
