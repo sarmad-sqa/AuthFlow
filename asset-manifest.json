@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/authflow/static/css/main.e6c13ad2.css",
-    "main.js": "/authflow/static/js/main.38a67dee.js",
+    "main.js": "/authflow/static/js/main.16dcd592.js",
     "static/js/453.5892e372.chunk.js": "/authflow/static/js/453.5892e372.chunk.js",
     "index.html": "/authflow/index.html",
     "main.e6c13ad2.css.map": "/authflow/static/css/main.e6c13ad2.css.map",
-    "main.38a67dee.js.map": "/authflow/static/js/main.38a67dee.js.map",
+    "main.16dcd592.js.map": "/authflow/static/js/main.16dcd592.js.map",
     "453.5892e372.chunk.js.map": "/authflow/static/js/453.5892e372.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.38a67dee.js"
+    "static/js/main.16dcd592.js"
   ]
 }
