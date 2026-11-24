@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_URL } from './api';
 
 function Login({ onShowSignup }) {
   // Password show/hide ke liye state
@@ -198,7 +199,7 @@ function Login({ onShowSignup }) {
 
     try {
       // Backend login API ko call karte hain (port 3001)
-      const response = await fetch('http://localhost:3001/login', {
+      const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -63,7 +63,7 @@ test('posts signup data and clears fields only after successful registration', a
   fireEvent.click(screen.getByRole('button', { name: /^submit$/i }));
 
   await waitFor(() => {
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/signup', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3001/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

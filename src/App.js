@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_URL } from './api';
 import Login from './Login';
 
 function App() {
@@ -37,7 +38,7 @@ function App() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:3001/signup', {
+      const response = await fetch(`${API_URL}/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

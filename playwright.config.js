@@ -40,8 +40,15 @@ module.exports = defineConfig({
       command: 'npm run start:e2e',
       url: 'http://localhost:3001',
       reuseExistingServer: !isCI,
-      timeout: 120000
+      timeout: 120000,
+      env: {
+        ...process.env,
+        PORT: '3001',
+        BROWSER: 'none',
+        REACT_APP_API_URL: 'http://localhost:3000'
+      }
     },
+
     {
       command: 'npm start',
       cwd: 'server',
