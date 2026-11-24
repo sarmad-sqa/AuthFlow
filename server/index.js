@@ -94,6 +94,102 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+// POST request ko /login endpoint par handle karte hain
+// async isliye use kiya kyun ke database read aur bcrypt compare asynchronous hain
+app.post('/login', async (req, res) => {
+
+    // Request body se email aur password extract karte hain
+    const { email, password } = req.body;
+
+    // Check karte hain ke user ne email aur password dono provide kiye hain
+    if (!email || !password) {
+
+        // Agar koi field missing hai toh execution stop karke 400 response bhejte hain
+        return res.status(400).json({
+
+            // Client ko validation error ka message dete hain
+            message: 'Email and password are required'
+        });
+    }
+
+    // try block mein database se user dhundhte hain aur password verify karte hain
+    try {
+
+        // Turso database se is email wala user select karte hain
+        const result = await db.execute({
+
+            // Sirf zaroori columns lete hain; password_hash compare ke liye chahiye
+            // Question mark parameter placeholder hai
+            sql: 'SELECT id, username, email, password_hash FROM users WHERE email = ?',
+
+            // Placeholder ki corresponding value provide karte hain
+            args: [email]
+        });
+
+        // Query ke pehle row ko user maan kar nikaalte hain (agar maujood ho)
+        const user = result.rows[0];
+
+        // Agar is email ka koi user nahi mila toh unauthorized response dete hain
+        // Message vague rakhte hain taake attacker ko pata na chale ke email exist karti hai ya nahi
+        if (!user) {
+
+            // HTTP 401 Unauthorized return karte hain
+            return res.status(401).json({
+
+                // Client ko generic invalid credentials ka message dete hain
+                message: 'Invalid email or password'
+            });
+        }
+
+        // User ke diye gaye plain password ko database ke password_hash se compare karte hain
+        const passwordMatches = await bcrypt.compare(password, user.password_hash);
+
+        // Agar password match nahi karta toh bhi wahi generic 401 message dete hain
+        if (!passwordMatches) {
+
+            // HTTP 401 Unauthorized return karte hain
+            return res.status(401).json({
+
+                // Client ko generic invalid credentials ka message dete hain
+                message: 'Invalid email or password'
+            });
+        }
+
+        // Password sahi hone par HTTP 200 success response bhejte hain
+        return res.status(200).json({
+
+            // Client ko successful login ka message dete hain
+            message: 'Login successful',
+
+            // Password hash client ko nahi bhejte — sirf safe user fields return karte hain
+            user: {
+
+                // Database se mila hua user id
+                id: user.id,
+
+                // Database se mila hua username
+                username: user.username,
+
+                // Database se mila hua email
+                email: user.email
+            }
+        });
+
+    // Database ya bcrypt compare mein error aaye toh catch execute hota hai
+    } catch (error) {
+
+        // Actual error terminal mein display karte hain
+        console.error('Login error:', error.message);
+
+        // Unexpected errors ke liye HTTP 500 return karte hain
+        return res.status(500).json({
+
+            // Client ko generic failure message dete hain
+            message: 'Unable to login'
+        });
+    }
+});
+
 app.get('/db-test', async (req, res) => {
       try {
         const result = await db.execute('SELECT 1 AS connected');

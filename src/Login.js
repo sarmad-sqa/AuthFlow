@@ -1,8 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function Login({ onShowSignup }) {
+  // Password show/hide ke liye state
   const [showPassword, setShowPassword] = useState(false);
+
+  // Kaunsa input focused hai — border highlight ke liye
   const [focusedField, setFocusedField] = useState(null);
+
+  // Email aur password form values
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+
+  // Login button dabate waqt loading dikhane ke liye
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Success / error toast message
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
+
+  // Toast 5 seconds baad khud hide ho jaye
+  useEffect(() => {
+    if (!toastMessage) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => setToastMessage(''), 5000);
+    return () => window.clearTimeout(timeoutId);
+  }, [toastMessage]);
 
   const styles = {
     pageBackground: {
@@ -125,6 +151,21 @@ function Login({ onShowSignup }) {
     signupLink: {
       color: '#156d81',
       fontWeight: '600'
+    },
+    toast: {
+      position: 'fixed',
+      bottom: '20px',
+      right: '20px',
+      zIndex: 1,
+      padding: '14px 20px',
+      borderRadius: '8px',
+      backgroundColor: '#1f7a4d',
+      color: 'white',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+      fontSize: '14px'
+    },
+    errorToast: {
+      backgroundColor: '#c0392b'
     }
   };
 
@@ -140,8 +181,66 @@ function Login({ onShowSignup }) {
       : styles.passwordInput;
   };
 
-  const handleSubmit = (e) => {
+  // Input change hone par formData update karte hain
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  // Login form submit — backend /login API call
+  const handleSubmit = async (e) => {
+    // Page refresh rokte hain
     e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // Backend login API ko call karte hain (port 3001)
+      const response = await fetch('http://localhost:3001/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      // Server ka JSON response padhte hain
+      let responseData = {};
+      try {
+        responseData = await response.json();
+      } catch {
+        // Agar JSON na mile toh status se message banayenge
+      }
+
+      // Agar login fail ho (401 / 400 / 500)
+      if (!response.ok) {
+        setToastType('error');
+        setToastMessage(
+          responseData.message || `Login failed (HTTP ${response.status}).`
+        );
+        return;
+      }
+
+      // Login successful
+      setToastType('success');
+      setToastMessage(
+        responseData.user?.username
+          ? `Welcome back, ${responseData.user.username}!`
+          : 'Login successful!'
+      );
+    } catch {
+      // Backend band ho ya network error
+      setToastType('error');
+      setToastMessage('Unable to connect to the login server. Please try again.');
+    } finally {
+      // Button dubara enable
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -151,6 +250,18 @@ function Login({ onShowSignup }) {
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
 
       <div style={styles.formContainer}>
+        {toastMessage && (
+          <div
+            role={toastType === 'error' ? 'alert' : 'status'}
+            aria-live={toastType === 'error' ? 'assertive' : 'polite'}
+            style={toastType === 'error'
+              ? { ...styles.toast, ...styles.errorToast }
+              : styles.toast}
+          >
+            {toastMessage}
+          </div>
+        )}
+
         <div style={styles.logoContainer}>
           <div style={styles.logo}>∆</div>
         </div>
@@ -162,6 +273,8 @@ function Login({ onShowSignup }) {
               id="login-email"
               type="email"
               name="email"
+              value={formData.email}
+              onChange={handleChange}
               onFocus={() => setFocusedField('email')}
               onBlur={() => setFocusedField(null)}
               style={getInputStyle('email')}
@@ -177,6 +290,8 @@ function Login({ onShowSignup }) {
                 id="login-password"
                 type={showPassword ? 'text' : 'password'}
                 name="password"
+                value={formData.password}
+                onChange={handleChange}
                 onFocus={() => setFocusedField('password')}
                 onBlur={() => setFocusedField(null)}
                 style={getPasswordInputStyle()}
@@ -195,8 +310,8 @@ function Login({ onShowSignup }) {
             </div>
           </div>
 
-          <button type="submit" style={styles.submitBtn}>
-            Login
+          <button type="submit" style={styles.submitBtn} disabled={isSubmitting}>
+            {isSubmitting ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
